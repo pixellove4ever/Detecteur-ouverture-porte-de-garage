@@ -1,0 +1,78 @@
+//Bibliotheques
+#include <ESP8266WiFi.h>//https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/ESP8266WiFi.h
+
+//Constantes
+#define LED D5
+#define UPDATE_TIME 500
+
+//Parametres
+String nom = "CapteurGarage";
+const char* ssid = "yourssid"; //SSID du réseau Wifi
+const char* password = "yourpassword"; //Mot de passe du réseau Wifi
+const int trigPin = 12;  //D6
+const int echoPin = 13;  //D7
+
+//Variables
+String command;
+unsigned long previousRequest = 0;
+long duration;
+int distance;
+int ouverture = 0;
+
+//Objects
+WiFiClient master;
+IPAddress server(192, 168, 0, 80);
+
+//Fonctions
+void setup() {
+ //Initialisation des GPIOs
+pinMode(trigPin, OUTPUT); // Déclarer trigPin comme une Output
+pinMode(echoPin, INPUT); // Déclarer trigPin comme une Input
+ //Initialisation de la liaison Serie USB
+ Serial.begin(115200);
+ Serial.println(F("Initialisation du systeme"));
+ //Initialisaton du wifi de l'ESP8266 
+ WiFi.begin(ssid, password);
+ while (WiFi.status() != WL_CONNECTED) {
+   delay(500); //Attente 0.5sec
+   Serial.print(F("."));
+ }
+ Serial.print(nom);
+ Serial.print(F(" connected to Wifi! IP address : ")); Serial.println(WiFi.localIP()); // Print the IP address
+ pinMode(LED, OUTPUT);
+}
+void loop() {
+  // Réinitialisation de la pin trigPin
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+
+  // Mettre la Pin trigPin à l'état haut pendant 10 microsecondes
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  // Lecture de la pin echoPin, la valeur renvoyée correspond au temps A/R que l'onde a parcouru
+  duration = pulseIn(echoPin, HIGH);
+
+  // Calcul de la distance
+  distance= duration*0.034/2; //distance =1/2 * durée * vitesse du son dans le vide (340m/s)
+  // Affichage de la distance sur la liaison série
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+  if (distance < 10){ ouverture =1;}// Si la distance calculée est inferieur à 10 cm, la porte est ouverte
+  else {ouverture = 0;}
+  //Optimisatioon : n'envoyer la requete que si la valeur de la distance change ?
+ requestMaster();
+ delay(5000); //5 secondes entre calcul de distance
+}
+void requestMaster( ) { /* function requestMaster */
+ ////Request to master
+ if ((millis() - previousRequest) > UPDATE_TIME) { // Le client se connect au serveur toute les 500ms
+   previousRequest = millis();
+   if (master.connect(server, 80)) { // Connexion au serveur
+     master.println(nom + ": Hey, la porte de garage est x:" + ouverture + "\r"); //le x est le charactere à partir du quel le master va couper la chaine
+     master.flush();
+   }
+ }
+}
