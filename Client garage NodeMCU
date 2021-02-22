@@ -6,7 +6,7 @@
 #define UPDATE_TIME 500
 
 //Parametres
-String nom = "CapteurGarage";
+String nom = "Porte Garage";
 const char* ssid = "yourssid"; //SSID du réseau Wifi
 const char* password = "yourpassword"; //Mot de passe du réseau Wifi
 const int trigPin = 12;  //D6
@@ -37,6 +37,7 @@ pinMode(echoPin, INPUT); // Déclarer trigPin comme une Input
    delay(500); //Attente 0.5sec
    Serial.print(F("."));
  }
+ Serial.println("");
  Serial.print(nom);
  Serial.print(F(" connected to Wifi! IP address : ")); Serial.println(WiFi.localIP()); // Print the IP address
  pinMode(LED, OUTPUT);
