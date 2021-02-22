@@ -8,8 +8,8 @@
 
 //Parametres
 String nom = "Master";
-const char* ssid = "Anananis"; //SSID du réseau Wifi
-const char* password = "1804amor"; //Mot de passe du réseau Wifi
+const char* ssid = "yourssid"; //SSID du réseau Wifi
+const char* password = "yourpassword"; //Mot de passe du réseau Wifi
 
 //Variables
 bool sendCmd = false;
