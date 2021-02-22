@@ -55,7 +55,7 @@ void clientRequest( ) { /* function clientRequest */
      Serial.print(" IP du client - > ");Serial.println(client.remoteIP());
      String request = client.readStringUntil('\r'); //reception de la request du client
      
-     if (request.indexOf("Slave0") == 0) {
+     if (request.indexOf("Porte Garage") == 0) {
        //En attente de la requete de l'esclave
        int index = request.indexOf(":");
        String slaveid = request.substring(0, index);
